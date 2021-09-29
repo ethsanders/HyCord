@@ -1,6 +1,11 @@
 # Created by ProfessorPiggos
-# See LICENSE file for LICENSE, GNU GENERAL PUBLIC LICENSE v3
+# See LICENSE file for LICENSE, GNU AFFERO GENERAL PUBLIC LICENSE v3
 # As of Python version 3.7, dictionaries are ordered. In Python 3.6 and earlier, dictionaries are unordered.
+
+# This must be changed to a valid host of your source code if you modify the bot in any way. 
+# This is a requirement of the license, and is in this bot to encourage sharing of modifications.
+# If you modify or remove the info command in any way to limit the sharing of source code, you must provide another way to share it with users.
+sourcecodelink = 'https://github.com/ProfessorPiggos/HyCord/'
 
 import nextcord
 import aiohttp
@@ -9,21 +14,26 @@ import json
 import sys
 from nextcord.ext import commands, tasks
 from datetime import datetime, timezone
-import logging
 import re
+
+import logging
+logging.basicConfig(level=logging.INFO) # Setting up logging
 
 try:
     with open("prefix.txt","r") as prefixfile:
         prefix = prefixfile.readlines()[0]
         prefixfile.close()
+        if not prefix.isalnum():
+            logging.error('Prefix set to non alphanumeric value. The prefix has been set to ",".')
+            prefix = ','
 except Exception:
     prefix = ','
+    logging.info('error reading prefix, setting to comma')
 
 intents = nextcord.Intents.default()
 description = "Bot that interfaces Hypixel API Data into Discord"
 bot = commands.Bot(command_prefix=prefix, description=description, intents=intents)
 
-logging.basicConfig(level=logging.INFO) # Setting up logging
 dumpcount = -1 #setting up counter for dump, it's at -1 since tasks run right away
 
 # Saving all of the configuration files. This could be changed to a singular config file, but this works for now.
@@ -213,8 +223,13 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             
     @commands.command(aliases=['add','notif','addnotification'],brief='Adds to your notification list',)
     async def addnotif(self, ctx, arg):
+        maxnotifsize = 10
         if not str(ctx.message.author.id) in jslist['settings']:
             await ctx.send(f"You need to run {prefix}notifsettings before adding notifications. Use {prefix}help notifsettings for syntax.")
+            return
+        if len(jslist['listcmd'][str(ctx.message.author.id)]) >= maxnotifsize and ctx.message.author.id != ownerid:
+            owner = await bot.fetch_user(ownerid)
+            await ctx.send(f"Sorry, your user notification limit of {maxnotifsize} has been reached. Either remove someone from your notification list, or ask {owner} to increase the limit.")
             return
         if len(jslist['track']) <= 32:
             if re.match(r'^[A-Za-z0-9_]+$', arg):
@@ -374,7 +389,10 @@ async def guildinfo(ctx, *, arg):
                         await ctx.send(js["name"] + ' has a guild level of ' + str(js["level"]) + '. ' + "Their top 3 games are " + js["preferred_games"][0] + ", " + js["preferred_games"][1] + ", and " + js["preferred_games"][2] + ".")
                     else:
                         await ctx.send(js["name"] + ' has a guild level of ' + str(js["level"]) + '.')
-                        
+@bot.command(aliases=['info'], brief='Gives info about the bot.')
+async def botinfo(ctx):
+    await ctx.send(f'**This bot has many features related to the Hypixel API. Use {prefix}help to look through all of the commands you can use. \n The source code for the bot is available at **{sourcecodelink}**. ProfessorPiggos is the main developer on the project.')
+
 if ownerfeatures:
     @bot.command(aliases=['s','stopbot'], brief='Stops the bot. Only the host of the bot can use this.')
     async def stop(ctx):
