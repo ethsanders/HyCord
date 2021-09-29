@@ -1,4 +1,4 @@
-# Hycord Bot
+# Hycord Discord Bot
 
 <p align="center">
   <a href="https://github.com/ProfessorPiggos/HyCord/search?l=Python">
