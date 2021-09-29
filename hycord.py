@@ -23,9 +23,6 @@ try:
     with open("prefix.txt","r") as prefixfile:
         prefix = prefixfile.readlines()[0]
         prefixfile.close()
-        if not prefix.isalnum():
-            logging.error('Prefix set to non alphanumeric value. The prefix has been set to ",".')
-            prefix = ','
 except Exception:
     prefix = ','
     logging.info('error reading prefix, setting to comma')
