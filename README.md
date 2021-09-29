@@ -4,7 +4,7 @@
   <a href="https://github.com/ProfessorPiggos/HyCord/search?l=Python">
     <img src="https://img.shields.io/badge/language-python-blue?color=ffd343" alt="Python" />
   </a>
-  <a href="https://github.com/ProfessorPiggos/HyCord/blob/master/LICENSE.md">
+  <a href="https://github.com/ProfessorPiggos/HyCord/blob/master/LICENSE">
     <img src="https://img.shields.io/github/license/ProfessorPiggos/HyCord" alt="License" />
   </a>
   <a href="https://github.com/ProfessorPiggos/HyCord/stargazers">
