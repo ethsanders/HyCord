@@ -21,7 +21,7 @@
 #### TLDR: Provides player notifications in Discord DMs, and much more with the Hypixel API.
 
 ###### Longer Explanation:
-As the TLDR says above, this bot provides player notifications via Discord DMs. This is only available to self host, due to the nature of the bot maxing out a Hypixel API key. The bot is currently capable of tracking 32 players at a time, with 25 players allowed to be online at a time. You can change these numbers inside of the bot if you would like.
+As the TLDR says above, this bot provides player notifications via Discord DMs. This is only available to self host, due to the nature of the bot maxing out a Hypixel API key. The bot is currently capable of tracking 32 players at a time, with 25 players allowed to be online at a time. You can change these numbers inside of the bot if you would like, but you will need to stay under the Hypixel and Mojang API limits. Per user notification limit is set to 10, unless they are set up as owner. This is again easily changable by editing code. If you edit any code, you must make sure you are following the terms of the license for this project (GNU AFFERO v3). Instructions for how to do this are at the top of hycord.py
 
 ## Bot Configuration
 ### Required:
