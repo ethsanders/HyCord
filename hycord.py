@@ -154,7 +154,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                                         if y.status == 200:
                                             js3 = await y.json()
                                             #try:
-                                            if js3['player']['lastLogin'] >= (unixtime - 60000):
+                                            if js3['player']['lastLogin'] >= (unixtime - 44500):
                                                 curname = js3['player']['displayname']
                                                 jslist['online'][a] = {}
                                                 jslist['online'][a]['displayname'] = curname
