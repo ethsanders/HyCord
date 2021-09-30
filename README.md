@@ -40,6 +40,6 @@ Required for owner features (bypass max user limit, and be able to stop bot). Le
 
 ## Requirements
 ### Python 3.7+
-Programmed in Python 3.8.5. Earlier versions should work (even 3.7), but due to the changes in dictionaries I would reccomend using the latest version of python you can.
+Programmed in Python 3.8.5. Earlier versions should work (even 3.6), but due to the changes in dictionaries I would reccomend using the latest version of python you can.
 ### Minecraft Account
 Needed for acquiring Hypixel API Key
