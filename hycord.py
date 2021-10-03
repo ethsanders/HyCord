@@ -173,10 +173,8 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                                 if jslist['settings'][str(b)]['join']:
                                     user = await bot.fetch_user(b)
                                     await user.send(output)
-                                
-                            if not self.onlinecheck.is_running():
-                                self.onlinecheck.start()
-                            
+                            if js['session']['online'] and not self.onlinecheck.is_running():
+                                self.onlinecheck.start()        
                         elif r.status == 429:
                             logging.error("Too many requests or API Down.")
                             continue
