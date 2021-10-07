@@ -73,7 +73,7 @@ if notificationsOn:
             if not 'online' in jslist:
                 jslist['online'] = {}
             listfile.close()
-    except IOError:
+    except (IOError,TypeError):
         jslist = {
             'track': {},
             'listcmd': {},
