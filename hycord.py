@@ -222,7 +222,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
         if not str(ctx.message.author.id) in jslist['settings']:
             await ctx.send(f"You need to run {prefix}notifsettings before adding notifications. Use {prefix}help notifsettings for syntax.")
             return
-        if len(jslist['listcmd'][str(ctx.message.author.id)]) >= maxnotifsize and ctx.message.author.id != ownerid:
+        if str(ctx.message.author.id) in jslist['listcmd'] and len(jslist['listcmd'][str(ctx.message.author.id)]) >= maxnotifsize and ctx.message.author.id != ownerid:
             owner = await bot.fetch_user(ownerid)
             await ctx.send(f"Sorry, your user notification limit of {maxnotifsize} has been reached. Either remove someone from your notification list, or ask {owner} to increase the limit.")
             return
