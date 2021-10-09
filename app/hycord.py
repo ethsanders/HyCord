@@ -18,7 +18,6 @@ import re
 from dotenv import load_dotenv
 from nextcord.ext import commands, tasks
 from datetime import datetime, timezone
-
 import logging
 logging.basicConfig(level=logging.INFO) # Setting up logging
 
