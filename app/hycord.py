@@ -9,6 +9,7 @@ sourcecodelink = 'https://github.com/ProfessorPiggos/HyCord/'
 
 import nextcord
 import aiohttp
+import aiofiles
 import asyncio
 import json
 import sys
@@ -386,8 +387,8 @@ if ownerfeatures:
     @bot.command(aliases=['s','stopbot'], brief='Stops the bot. Only the host of the bot can use this.')
     async def stop(ctx):
         if int(ctx.message.author.id) == ownerid:
-            with open("data.json", "w") as outfile:
-                json.dump(jslist,outfile,indent=6)
+            with await aiofiles.open("data.json", "w") as outfile:
+                await json.dump(jslist,outfile,indent=6)
                 if Notifications.check.is_running():
                     Notifications.check.stop()
                     print(Notifications.check.is_running())
