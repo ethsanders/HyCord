@@ -1,2 +1,5 @@
 /.vscode
 /app/data.json
+.replit
+*.toml
+*.lock
