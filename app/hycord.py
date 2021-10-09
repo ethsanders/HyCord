@@ -36,12 +36,10 @@ dumpcount = -1 #setting up counter for dump, it's at -1 since tasks run right aw
 # Saving all of the configuration files. This could be changed to a singular config file, but this works for now.
 with open("discordtoken.txt", "r") as tokenfile:
     token = tokenfile.readlines()[0]
-    tokenfile.close()
 
 try:
     with open("notifications.txt", "r") as settingsfile:
         settings = settingsfile.readlines()[0]
-        settingsfile.close()
         if settings == "on":
             notificationsOn = True
         else:
@@ -52,7 +50,6 @@ except IOError:
 try:
     with open("hypixelapikey.txt", "r") as keyfile:
         apikey = keyfile.readlines()[0]
-        keyfile.close()
 except IOError:
     if notificationsOn:
         logging.warning("No Hypixel API key specified. Notification service has been disabled. Please add a hypixel api key if you would like to use notifications.")
@@ -72,7 +69,6 @@ if notificationsOn:
                 jslist['settings'] = {}
             if not 'online' in jslist:
                 jslist['online'] = {}
-            listfile.close()
     except (IOError,TypeError):
         jslist = {
             'track': {},
@@ -86,7 +82,6 @@ try:
     with open('ownerid.txt','r') as owneridfile:
         ownerid = int(owneridfile.readlines()[0]) # Might add support for multiple admins later.
         ownerfeatures = True
-        owneridfile.close()
 except IOError:
     ownerfeatures = False
     logging.info("Owner ID not specified. Stop command disabled.")
@@ -184,9 +179,8 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
         dumpcount += 1
         if dumpcount == 13:
             dumpcount = 0
-            outfile = open("data.json", "w")
-            json.dump(jslist,outfile,indent=6)
-            outfile.close()
+            with open("data.json", "w") as outfile:
+                json.dump(jslist,outfile,indent=6)
 
     @check.before_loop
     async def before_check(self):
@@ -392,37 +386,36 @@ if ownerfeatures:
     @bot.command(aliases=['s','stopbot'], brief='Stops the bot. Only the host of the bot can use this.')
     async def stop(ctx):
         if int(ctx.message.author.id) == ownerid:
-            outfile = open("data.json", "w")
-            json.dump(jslist,outfile,indent=6)
-            outfile.close()
-            if Notifications.check.is_running():
-                Notifications.check.stop()
-                print(Notifications.check.is_running())
-                loopcount1 = 0
-                await ctx.send("**Shutting down offline player check...**")
-                while Notifications.check.is_running():
-                    await asyncio.sleep(0.25)
-                    loopcount1 += 1
-                    if (loopcount1 >= 48):
-                        await ctx.send("**This is taking a while, but the bot is still running.**")
-                        loopcount1 = 0
-                await ctx.send("**Offline check shut down.**")
-            if Notifications.onlinecheck.is_running():
-                Notifications.onlinecheck.stop()
-                print(Notifications.onlinecheck.is_running())
-                loopcount2 = 0
-                await ctx.send("**Shutting down online player check...**")
-                while Notifications.onlinecheck.is_running():
-                    await asyncio.sleep(0.25)
-                    loopcount2 += 1
-                    if (loopcount2 >= 48):
-                        await ctx.send("**This is taking a while, but the bot is still running.**")
-                        loopcount2 = 0
-                await ctx.send("**Online check shut down.**")
-            await ctx.send("Bot has been shut down. Goodbye.")
-            loop = asyncio.get_event_loop()
-            loop.call_soon_threadsafe(loop.stop)
-            loop.call_soon_threadsafe(sys.exit())
+            with open("data.json", "w") as outfile:
+                json.dump(jslist,outfile,indent=6)
+                if Notifications.check.is_running():
+                    Notifications.check.stop()
+                    print(Notifications.check.is_running())
+                    loopcount1 = 0
+                    await ctx.send("**Shutting down offline player check...**")
+                    while Notifications.check.is_running():
+                        await asyncio.sleep(0.25)
+                        loopcount1 += 1
+                        if (loopcount1 >= 48):
+                            await ctx.send("**This is taking a while, but the bot is still running.**")
+                            loopcount1 = 0
+                    await ctx.send("**Offline check shut down.**")
+                if Notifications.onlinecheck.is_running():
+                    Notifications.onlinecheck.stop()
+                    print(Notifications.onlinecheck.is_running())
+                    loopcount2 = 0
+                    await ctx.send("**Shutting down online player check...**")
+                    while Notifications.onlinecheck.is_running():
+                        await asyncio.sleep(0.25)
+                        loopcount2 += 1
+                        if (loopcount2 >= 48):
+                            await ctx.send("**This is taking a while, but the bot is still running.**")
+                            loopcount2 = 0
+                    await ctx.send("**Online check shut down.**")
+                await ctx.send("Bot has been shut down. Goodbye.")
+                loop = asyncio.get_event_loop()
+                loop.call_soon_threadsafe(loop.stop)
+                loop.call_soon_threadsafe(sys.exit())
         else:
             await ctx.send("it's not going to work for you, don't even try it")
 

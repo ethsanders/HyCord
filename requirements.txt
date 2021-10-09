@@ -1,0 +1,2 @@
+aiohttp>=3.7.4.post0
+nextcord>=2.0.0a2f

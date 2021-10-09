@@ -39,7 +39,7 @@ Required for notification service. Look up "How to get hypixel api key" for info
 Required for owner features (bypass max user limit, and be able to stop bot). Leave empty if you don't want these features. Look up "how to get Discord user id" for info on how to get this.
 
 ## Requirements
-### Python 3.7+
-Programmed in Python 3.8.5. Earlier versions should work (even 3.6), but due to the changes in dictionaries I would reccomend using the latest version of python you can.
+### Python 3.8+
+Programmed in Python 3.8.5. You must have at least 3.8, this is a dependency of the nextcord library.
 ### Minecraft Account
 Needed for acquiring Hypixel API Key
