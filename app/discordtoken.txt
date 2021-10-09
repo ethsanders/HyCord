@@ -1,1 +1,0 @@
-Replace this line with your discord bot token. Make sure to not add a new line.

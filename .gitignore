@@ -1,5 +1,5 @@
 /.vscode
 /app/data.json
 .replit
-*.toml
-*.lock
+pyproject.toml
+poetry.lock

@@ -13,50 +13,54 @@ import aiofiles
 import asyncio
 import json
 import sys
+import os
+import re
+from dotenv import load_dotenv
 from nextcord.ext import commands, tasks
 from datetime import datetime, timezone
-import re
 
 import logging
 logging.basicConfig(level=logging.INFO) # Setting up logging
 
+load_dotenv()
 try:
-    with open("prefix.txt","r") as prefixfile:
-        prefix = prefixfile.readlines()[0]
-        prefixfile.close()
-except Exception:
-    prefix = ','
+    PREFIX = os.getenv("PREFIX")
+except:
+    PREFIX = ','
     logging.info('error reading prefix, setting to comma')
 
 intents = nextcord.Intents.default()
 description = "Bot that interfaces Hypixel API Data into Discord"
-bot = commands.Bot(command_prefix=prefix, description=description, intents=intents)
+bot = commands.Bot(command_prefix=PREFIX, description=description, intents=intents)
 
 dumpcount = -1 #setting up counter for dump, it's at -1 since tasks run right away
 
 # Saving all of the configuration files. This could be changed to a singular config file, but this works for now.
-with open("discordtoken.txt", "r") as tokenfile:
-    token = tokenfile.readlines()[0]
+
+TOKEN = os.getenv("TOKEN")
+if TOKEN == "discord_bot_token":
+    class NoBotToken(Exception):
+        pass
+    raise NoBotToken("Please put your discord bot token in the .env file.")
 
 try:
-    with open("notifications.txt", "r") as settingsfile:
-        settings = settingsfile.readlines()[0]
-        if settings == "on":
-            notificationsOn = True
-        else:
-            notificationsOn = False
+    SETTINGS = os.getenv("NOTIFICATIONS")
+    if SETTINGS == "on":
+        NOTIFICATIONS = True
+    else:
+        NOTIFICATIONS = False
 except IOError:
-    notificationsOn = True
+    logging.info("Error with NOTIFICATIONS settings, set to on.")
+    NOTIFICATIONS = True
 
-try:
-    with open("hypixelapikey.txt", "r") as keyfile:
-        apikey = keyfile.readlines()[0]
-except IOError:
-    if notificationsOn:
-        logging.warning("No Hypixel API key specified. Notification service has been disabled. Please add a hypixel api key if you would like to use notifications.")
-    notificationsOn = False
-
-if notificationsOn:
+if NOTIFICATIONS:
+    try:
+        APIKEY = os.getenv("APIKEY")
+    except:
+        class NoHypixelAPIToken(Exception):
+            pass
+        raise NoHypixelAPIToken("API Key Error with notif service on")
+    assert APIKEY != "hypixel_api_key", "API Key must be changed from default value if notification service is on."
     GAMESLIST = ['join','leave','BEDWARS',"DUELS","SKYBLOCK","BUILD_BATTLE",'PIT','SMP','PROTOTYPE','SKYWARS','MCGO','ARCADE','TNTGAMES','UHC','MURDER_MYSTERY','SURVIVAL_GAMES','QUAKECRAFT','GINGERBREAD']
     USERGAMESLIST = ['Join','Leave','Bedwars','Duels','Skyblock','Build Battle', 'The Pit', 'SMP', 'Prototype Games', 'Skywars','Cops and Crims', 'Arcade Games', 'TNT Games', 'UHC', 'Murder Mystery', 'Blitz Survival Games', 'Quakecraft', 'Turbo Kart Racers']
     try:
@@ -80,13 +84,11 @@ if notificationsOn:
         logging.info("JSON File not found. Creating one.")
 
 try:
-    with open('ownerid.txt','r') as owneridfile:
-        ownerid = int(owneridfile.readlines()[0]) # Might add support for multiple admins later.
-        ownerfeatures = True
-except IOError:
-    ownerfeatures = False
+    OWNERID = int(os.getenv("OWNERID")) # No assertion as error will already caused if there is str to int conversion.
+    OWNERFEATURES = True
+except:
+    OWNERFEATURES = False
     logging.info("Owner ID not specified. Stop command disabled.")
-
 
 class Notifications(commands.Cog): #Notification service, can be disabled with notifications.txt
     def __init__(self,bot):
@@ -98,7 +100,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             if jslist['online'][a]['trueonline']:
                 curname = jslist['online'][a]['displayname']
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(f'https://api.hypixel.net/status?key={apikey}&uuid={a}') as r:
+                    async with session.get(f'https://api.hypixel.net/status?key={APIKEY}&uuid={a}') as r:
                         if r.status == 200:
                             js = await r.json()   
                             if not js['session']['online']:
@@ -122,7 +124,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
         for a in jslist['track']:
             if not a in jslist['online']:
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(f'https://api.hypixel.net/status?key={apikey}&uuid={a}') as r:
+                    async with session.get(f'https://api.hypixel.net/status?key={APIKEY}&uuid={a}') as r:
                         if r.status == 200:
                             js = await r.json()
                             if js['session']['online']:
@@ -138,7 +140,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                                                 jslist['online'][a]['displayname'] = curname
                                                 try:
                                                     game = USERGAMESLIST[GAMESLIST.index(jslist['online'][a]["game"])]
-                                                except Exception: #if user in limbo or lobby or smthn
+                                                except: #if user in limbo or lobby or smthn
                                                     game = jslist['online'][a]["game"]
                                                 mode = jslist['online'][a]["mode"]
                                             else:
@@ -146,7 +148,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                                                 continue
                             else:
                                 async with aiohttp.ClientSession() as session2:
-                                    async with session2.get(f'https://api.hypixel.net/player?key={apikey}&uuid={a}') as y:
+                                    async with session2.get(f'https://api.hypixel.net/player?key={APIKEY}&uuid={a}') as y:
                                         if y.status == 200:
                                             js3 = await y.json()
                                             #try:
@@ -180,7 +182,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
         dumpcount += 1
         if dumpcount == 13:
             dumpcount = 0
-            with await aiofiles.open("data.json", "w") as outfile:
+            async with aiofiles.open("data.json", "w") as outfile:
                 json.dump(jslist,outfile,indent=6)
 
     @check.before_loop
@@ -208,17 +210,17 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             else:
                 output = f"**1 player:** {playerlist[0]}"
             await ctx.send(output)
-        except Exception:
+        except:
             await ctx.send("There is no one in the list.")
             
     @commands.command(aliases=['add','notif','addnotification'],brief='Adds to your notification list',)
     async def addnotif(self, ctx, arg):
         maxnotifsize = 10
         if not str(ctx.message.author.id) in jslist['settings']:
-            await ctx.send(f"You need to run {prefix}notifsettings before adding notifications. Run {prefix}notifsettings without any arguments for setup instructions.")
+            await ctx.send(f"You need to run {PREFIX}notifsettings before adding notifications. Run {PREFIX}notifsettings without any arguments for setup instructions.")
             return
-        if str(ctx.message.author.id) in jslist['listcmd'] and len(jslist['listcmd'][str(ctx.message.author.id)]) >= maxnotifsize and ctx.message.author.id != ownerid:
-            owner = await bot.fetch_user(ownerid)
+        if str(ctx.message.author.id) in jslist['listcmd'] and len(jslist['listcmd'][str(ctx.message.author.id)]) >= maxnotifsize and ctx.message.author.id != OWNERID:
+            owner = await bot.fetch_user(OWNERID)
             await ctx.send(f"Sorry, your user notification limit of {maxnotifsize} has been reached. Either remove someone from your notification list, or ask {owner} to increase the limit.")
             return
         if len(jslist['track']) <= 32:
@@ -248,7 +250,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                 await ctx.send("That is not a valid name.")
         else:
             logging.warning("Max list size for notifications has been reached.")
-            user = await bot.fetch_user(ownerid)
+            user = await bot.fetch_user(OWNERID)
             await ctx.send(f"Sorry, the global notification list is full. Please contact {user} to let them know.")
 
     @commands.command(aliases=['remove','removenotif','removenotification'],brief='Removes from your notification list')
@@ -285,14 +287,14 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             else:
                 output = f"**1 player:** {jslist['listcmd'][str(ctx.message.author.id)][0]}"
             await ctx.send(output)
-        except Exception:
+        except:
             await ctx.send("There is no one in the list.")
 
     @commands.command(aliases=['settings','options','notifset','notifoptions','set'],brief='Configures notifications. Run for more info.')
     async def notifsettings(self,ctx,*args):
         jslist['settings'][str(ctx.message.author.id)] = {}
         if args == ():
-            await ctx.send(f"The setup process isn't great right now, hopefully it will get better later. You will enter on or off for every game/task listed below. **All notifcations except join notifications are unavailable for players with their API disabled.** Please have a space in between each one. Your command should look like {prefix}notifsettings on off off on on... etc. The game list is as follows:\n\n**Server Join Notifications\nServer Leave Notifications\nBedwars\nDuels\nSkyblock\nBuild Battle\nThe Pit\nSMP\nPrototype Games\nSkywars\nCops and Crims\nArcade Games\nTNT Games\nUHC\nMurder Mystery\nSurvival Games\nQuakecraft\nTurbo Kart Racers**\nYou can also do {prefix}notifsettings llon, or {prefix}notifsettings joinonly.")
+            await ctx.send(f"The setup process isn't great right now, hopefully it will get better later. You will enter on or off for every game/task listed below. **All notifcations except join notifications are unavailable for players with their API disabled.** Please have a space in between each one. Your command should look like {PREFIX}notifsettings on off off on on... etc. The game list is as follows:\n\n**Server Join Notifications\nServer Leave Notifications\nBedwars\nDuels\nSkyblock\nBuild Battle\nThe Pit\nSMP\nPrototype Games\nSkywars\nCops and Crims\nArcade Games\nTNT Games\nUHC\nMurder Mystery\nSurvival Games\nQuakecraft\nTurbo Kart Racers**\nYou can also do {PREFIX}notifsettings allon, or {PREFIX}notifsettings joinonly.")
         elif len(args) == len(GAMESLIST):
             playersettings = list(args)
             for i, a in enumerate(playersettings):
@@ -301,18 +303,18 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                     jslist['settings'][str(ctx.message.author.id)][GAMESLIST[i]] = True
                 else:
                     jslist['settings'][str(ctx.message.author.id)][GAMESLIST[i]] = False
-            await ctx.send(f"Settings have sucessfully been set. You can now use the {prefix}addnotif command, or use this command again.")
+            await ctx.send(f"Settings have sucessfully been set. You can now use the {PREFIX}addnotif command, or use this command again.")
         elif len(args) == 1:
             argument = str.casefold(str(args[0]))
             if argument == 'joinonly':
                 jslist['settings'][str(ctx.message.author.id)][GAMESLIST[0]] = True
                 for i in range(len(GAMESLIST)-1):
                     jslist['settings'][str(ctx.message.author.id)][GAMESLIST[i+1]] = False
-                await ctx.send(f"Only join notifications will be sent. You can now use the {prefix}addnotif command.")
+                await ctx.send(f"Only join notifications will be sent. You can now use the {PREFIX}addnotif command.")
             if argument == 'allon':
                 for i in range(len(GAMESLIST)):
                     jslist['settings'][str(ctx.message.author.id)][GAMESLIST[i]] = True
-                await ctx.send(f"All notifications will be sent. You can now use the {prefix}addnotif command.")
+                await ctx.send(f"All notifications will be sent. You can now use the {PREFIX}addnotif command.")
 
         else:
             for i in range(len(GAMESLIST)):
@@ -381,14 +383,14 @@ async def guildinfo(ctx, *, arg):
                         await ctx.send(js["name"] + ' has a guild level of ' + str(js["level"]) + '.')
 @bot.command(aliases=['info'], brief='Gives info about the bot.')
 async def botinfo(ctx):
-    await ctx.send(f'**This bot has many features related to the Hypixel API. Use {prefix}help to look through all of the commands you can use. \n The source code for the bot is available at **{sourcecodelink}**. ProfessorPiggos is the main developer on the project.')
+    await ctx.send(f'**This bot has many features related to the Hypixel API. Use {PREFIX}help to look through all of the commands you can use. \n The source code for the bot is available at **{sourcecodelink}**. ProfessorPiggos is the main developer on the project.')
 
-if ownerfeatures:
+if OWNERFEATURES:
     @bot.command(aliases=['s','stopbot'], brief='Stops the bot. Only the host of the bot can use this.')
     async def stop(ctx):
-        if int(ctx.message.author.id) == ownerid:
-            with await aiofiles.open("data.json", "w") as outfile:
-                await json.dump(jslist,outfile,indent=6)
+        if int(ctx.message.author.id) == OWNERID:
+            async with aiofiles.open("data.json", mode="w") as outfile:
+                json.dump(jslist,outfile,indent=6)
                 if Notifications.check.is_running():
                     Notifications.check.stop()
                     print(Notifications.check.is_running())
@@ -420,9 +422,9 @@ if ownerfeatures:
         else:
             await ctx.send("it's not going to work for you, don't even try it")
 
-if notificationsOn:
+if NOTIFICATIONS:
     bot.add_cog(Notifications(bot))
 try:
-    bot.run(token)
+    bot.run(TOKEN)
 except RuntimeError: # To avoid issues after stopping async event loop.
     pass

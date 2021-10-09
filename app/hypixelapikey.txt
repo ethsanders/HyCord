@@ -1,1 +1,0 @@
-Replace this line with your hypixel api key. Make sure to not add a new line.
