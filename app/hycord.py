@@ -70,7 +70,7 @@ if notificationsOn:
                 jslist['settings'] = {}
             if not 'online' in jslist:
                 jslist['online'] = {}
-    except (IOError,TypeError):
+    except:
         jslist = {
             'track': {},
             'listcmd': {},
@@ -180,7 +180,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
         dumpcount += 1
         if dumpcount == 13:
             dumpcount = 0
-            with open("data.json", "w") as outfile:
+            with await aiofiles.open("data.json", "w") as outfile:
                 json.dump(jslist,outfile,indent=6)
 
     @check.before_loop
@@ -215,7 +215,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
     async def addnotif(self, ctx, arg):
         maxnotifsize = 10
         if not str(ctx.message.author.id) in jslist['settings']:
-            await ctx.send(f"You need to run {prefix}notifsettings before adding notifications. Use {prefix}help notifsettings for syntax.")
+            await ctx.send(f"You need to run {prefix}notifsettings before adding notifications. Run {prefix}notifsettings without any arguments for setup instructions.")
             return
         if str(ctx.message.author.id) in jslist['listcmd'] and len(jslist['listcmd'][str(ctx.message.author.id)]) >= maxnotifsize and ctx.message.author.id != ownerid:
             owner = await bot.fetch_user(ownerid)
@@ -292,7 +292,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
     async def notifsettings(self,ctx,*args):
         jslist['settings'][str(ctx.message.author.id)] = {}
         if args == ():
-            await ctx.send(f"The setup process isn't great right now, hopefully it will get better later. You will enter on or off for every game/task listed below. **All notifcations except join notifications are unavailable for players with their API disabled.** Please have a space in between each one. Your command should look like {prefix}notifsettings on off off on on... etc. The game list is as follows:\n\n**Server Join Notifications\nServer Leave Notifications\nBedwars\nDuels\nSkyblock\nBuild Battle\nThe Pit\nSMP\nPrototype Games\nSkywars\nCops and Crims\nArcade Games\nTNT Games\nUHC\nMurder Mystery\nSurvival Games\nQuakecraft\nTurbo Kart Racers**")
+            await ctx.send(f"The setup process isn't great right now, hopefully it will get better later. You will enter on or off for every game/task listed below. **All notifcations except join notifications are unavailable for players with their API disabled.** Please have a space in between each one. Your command should look like {prefix}notifsettings on off off on on... etc. The game list is as follows:\n\n**Server Join Notifications\nServer Leave Notifications\nBedwars\nDuels\nSkyblock\nBuild Battle\nThe Pit\nSMP\nPrototype Games\nSkywars\nCops and Crims\nArcade Games\nTNT Games\nUHC\nMurder Mystery\nSurvival Games\nQuakecraft\nTurbo Kart Racers**\nYou can also do {prefix}notifsettings llon, or {prefix}notifsettings joinonly.")
         elif len(args) == len(GAMESLIST):
             playersettings = list(args)
             for i, a in enumerate(playersettings):
