@@ -42,7 +42,7 @@ Required for notification service. Look up "How to get hypixel api key" for info
 
 ### Docker (Recommended)
 This is the reccomended method of installation. You must install docker, but docker-compose isn't required.
-In the folder with your "env" file, run the command `docker run -d --env-file ./env professorpiggos/hycord`. That's all that you have to do. If you run this command when a new release has been added, it will automatically update. You can also build your own image using the Dockerfile in the repository, or download an image from GitHub Packages.
+In the folder with your "env" file, run the command `docker run -d --env-file ./env professorpiggos/hycord:latest`. That's all that you have to do. If you run this command when a new release has been added, it will automatically update. You can also build your own image using the Dockerfile in the repository, or download an image from GitHub Packages.
 ### Manual
 This isn't recommended as you won't get automatic updates on restart, but you can do it. 
 1. Run the command `git clone https://github.com/ProfessorPiggos/HyCord/`.
