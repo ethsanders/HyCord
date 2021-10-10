@@ -2,16 +2,16 @@
 # Leave values as they are if you aren't changing them.
 
 # Required
-TOKEN = discord_bot_token
+TOKEN=discord_bot_token
 
 # Default value is "," but can be changed.
-PREFIX = ,
+PREFIX=,
 
 # Optional, enables some features
-OWNERID = your_discord_id
+OWNERID=your_discord_id
 
 # Can be either "on" or "off".
-NOTIFICATIONS = on
+NOTIFICATIONS=on
 
-#Required if NOTIFICATIONS is on
-APIKEY = hypixel_api_key
+# Required if NOTIFICATIONS is on
+APIKEY=hypixel_api_key

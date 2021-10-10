@@ -90,11 +90,11 @@ except:
     logging.info("Owner ID not specified. Stop command disabled.")
 
 class Notifications(commands.Cog): #Notification service, can be disabled with notifications.txt
-    def __init__(self,bot):
+    def __init__(self,bot) -> None:
         self.check.start()
 
     @tasks.loop(seconds=20)
-    async def onlinecheck(self):
+    async def onlinecheck(self) -> None:
         for a in jslist['online']:
             if jslist['online'][a]['trueonline']:
                 curname = jslist['online'][a]['displayname']
@@ -117,9 +117,9 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                                         user = await bot.fetch_user(b)
                                         await user.send(f'**{curname}** joined the game "{game}". They are currently in the mode "{mode}".')
     @tasks.loop(seconds=45)
-    async def check(self):
+    async def check(self) -> None:
         global dumpcount
-        unixtime = int(datetime.now(timezone.utc).timestamp() * 1000)
+        unixtime = int(datetime.now(timezone.utc).timestamp() * 1000) # ms timestamp
         for a in jslist['track']:
             if not a in jslist['online']:
                 async with aiohttp.ClientSession() as session:
@@ -145,13 +145,13 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                                             else:
                                                 logging.error("Error with Mojang API")
                                                 continue
-                            else:
+                            else: # Bypass for players with their api disabled.
                                 async with aiohttp.ClientSession() as session2:
-                                    async with session2.get(f'https://api.hypixel.net/player?key={APIKEY}&uuid={a}') as y:
-                                        if y.status == 200:
-                                            js3 = await y.json()
+                                    async with session2.get(f'https://api.hypixel.net/player?key={APIKEY}&uuid={a}') as t:
+                                        if t.status == 200:
+                                            js3 = await t.json()
                                             #try:
-                                            if js3['player']['lastLogin'] >= (unixtime - 44500):
+                                            if js3['player']['lastLogin'] >= (unixtime - 44500): # 44.5 seconds, stops double notifs
                                                 curname = js3['player']['displayname']
                                                 jslist['online'][a] = {}
                                                 jslist['online'][a]['displayname'] = curname
@@ -185,12 +185,12 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
                 json.dump(jslist,outfile,indent=6)
 
     @check.before_loop
-    async def before_check(self):
+    async def before_check(self) -> None:
         await bot.wait_until_ready()
         logging.info('Notification service started.')
 
     @commands.command(aliases=['online','whosonline','currentonline','myonlinelist','currentlyonline'], brief="Shows a list of all players on your notification list that are currently online")
-    async def onlinelist(self, ctx):
+    async def onlinelist(self, ctx) -> None:
         user = ctx.message.author.id
         playerlist = []
         try:
@@ -213,7 +213,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             await ctx.send("There is no one in the list.")
             
     @commands.command(aliases=['add','notif','addnotification'],brief='Adds to your notification list',)
-    async def addnotif(self, ctx, arg):
+    async def addnotif(self, ctx, arg) -> None:
         maxnotifsize = 10
         if not str(ctx.message.author.id) in jslist['settings']:
             await ctx.send(f"You need to run {PREFIX}notifsettings before adding notifications. Run {PREFIX}notifsettings without any arguments for setup instructions.")
@@ -253,7 +253,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             await ctx.send(f"Sorry, the global notification list is full. Please contact {user} to let them know.")
 
     @commands.command(aliases=['remove','removenotif','removenotification'],brief='Removes from your notification list')
-    async def delnotif(self, ctx,arg):
+    async def delnotif(self, ctx,arg) -> None:
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://api.mojang.com/users/profiles/minecraft/{arg}') as r:
                 if r.status == 200:
@@ -272,7 +272,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             await ctx.send(f"You aren't on the notificiation list for {arg}.")
 
     @commands.command(aliases=['list','listnotification','listnotifications'],brief='Lists your notifications')
-    async def listnotif(self,ctx):
+    async def listnotif(self,ctx) -> None:
         try:
             if len(jslist['listcmd'][str(ctx.message.author.id)]) != 1:
                 output = ("**" + str(len(jslist['listcmd'][str(ctx.message.author.id)])) + " players:** ")
@@ -290,7 +290,7 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             await ctx.send("There is no one in the list.")
 
     @commands.command(aliases=['settings','options','notifset','notifoptions','set'],brief='Configures notifications. Run for more info.')
-    async def notifsettings(self,ctx,*args):
+    async def notifsettings(self,ctx,*args) -> None:
         jslist['settings'][str(ctx.message.author.id)] = {}
         if args == ():
             await ctx.send(f"The setup process isn't great right now, hopefully it will get better later. You will enter on or off for every game/task listed below. **All notifcations except join notifications are unavailable for players with their API disabled.** Please have a space in between each one. Your command should look like {PREFIX}notifsettings on off off on on... etc. The game list is as follows:\n\n**Server Join Notifications\nServer Leave Notifications\nBedwars\nDuels\nSkyblock\nBuild Battle\nThe Pit\nSMP\nPrototype Games\nSkywars\nCops and Crims\nArcade Games\nTNT Games\nUHC\nMurder Mystery\nSurvival Games\nQuakecraft\nTurbo Kart Racers**\nYou can also do {PREFIX}notifsettings allon, or {PREFIX}notifsettings joinonly.")
@@ -321,11 +321,11 @@ class Notifications(commands.Cog): #Notification service, can be disabled with n
             await ctx.send(f"You didn't have the correct amount of arguments. You should have {len(GAMESLIST)} arguments. Everything set to on.")
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     print('Logged in as ' + bot.user.name + '. Bot ID is ' + str(bot.user.id) + '.')
 
 @bot.command(aliases=['status','playing'],brief='Gets the status of any player')
-async def getstatus(ctx, arg):
+async def getstatus(ctx, arg) -> None:
     async with aiohttp.ClientSession() as session:
         async with session.get('https://api.slothpixel.me/api/players/' + arg + '/status') as r:
             if r.status == 200:
@@ -336,7 +336,7 @@ async def getstatus(ctx, arg):
                     await ctx.send("Sorry, " + arg + " isn't online right now :(")
 
 @bot.command(aliases=['players','hypixelplayers'],brief='Gets Hypixel player count')
-async def playercount(ctx):
+async def playercount(ctx) -> None:
     async with aiohttp.ClientSession() as session:
         async with session.get('https://api.slothpixel.me/api/counts') as r:
             if r.status == 200:
@@ -344,7 +344,7 @@ async def playercount(ctx):
                 await ctx.send("There are currently " + str(js["playerCount"]) + " players online on Hypixel.")
 
 @bot.command(aliases=['playerguild','findguild','guildbyplayer'],brief='Gets info of a guild by player name')
-async def guildfinder(ctx, arg):
+async def guildfinder(ctx, arg) -> None:
     async with aiohttp.ClientSession() as session:
         async with session.get('https://api.slothpixel.me/api/guilds/' + arg) as r:
             if r.status == 200:
@@ -364,7 +364,7 @@ async def guildfinder(ctx, arg):
                 await ctx.send(arg + " isn't in a guild.")
 
 @bot.command(aliases=['guild','guildsearch','guildbyname'],brief='Gets info of a guild by guild name')
-async def guildinfo(ctx, *, arg):
+async def guildinfo(ctx, *, arg) -> None:
     async with aiohttp.ClientSession() as session:
         async with session.get('https://api.slothpixel.me/api/guilds/name/' + arg) as r:
             if r.status == 200:
@@ -381,12 +381,12 @@ async def guildinfo(ctx, *, arg):
                     else:
                         await ctx.send(js["name"] + ' has a guild level of ' + str(js["level"]) + '.')
 @bot.command(aliases=['info'], brief='Gives info about the bot.')
-async def botinfo(ctx):
+async def botinfo(ctx) -> None:
     await ctx.send(f'**This bot has many features related to the Hypixel API. Use {PREFIX}help to look through all of the commands you can use. \n The source code for the bot is available at **{sourcecodelink}**. ProfessorPiggos is the main developer on the project.')
 
 if OWNERFEATURES:
     @bot.command(aliases=['s','stopbot'], brief='Stops the bot. Only the host of the bot can use this.')
-    async def stop(ctx):
+    async def stop(ctx) -> None:
         if int(ctx.message.author.id) == OWNERID:
             async with aiofiles.open("data.json", mode="w") as outfile:
                 json.dump(jslist,outfile,indent=6)
@@ -427,3 +427,8 @@ try:
     bot.run(TOKEN)
 except RuntimeError: # To avoid issues after stopping async event loop.
     pass
+except TypeError:
+    class EnvFileError(Exception):
+        pass
+    raise EnvFileError("Issue with loading enviornment file.")
+    
