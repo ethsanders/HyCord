@@ -24,8 +24,8 @@ As the TLDR says above, this bot provides player notifications via Discord DMs. 
 ## Installation
 ### General Installation
 1. Make a folder for the repository.
-2. For all installation methods you will  need the "env" file in the root of the repository. For Docker installation, that can be downloaded [here](https://github.com/ProfessorPiggos/HyCord/blob/master/env). If you are not using docker, you will need to rename the file to ".env"
-3. Edit the values in the env file. You can do this by editing the values after the equals sign. Information on each value can be found below.
+2. For all installation methods you will  need the ".env" file in the root of the repository. For Docker installation, that can be downloaded [here](https://github.com/ProfessorPiggos/HyCord/blob/master/.env).
+3. Edit the values in the ".env" file. You can do this by editing the values after the equals sign. Information on each value can be found below.
 #### Required:
 ###### TOKEN
 You must put a Discord bot token here. Google "Discord bot key tutorial" for info on how to get this token.
@@ -42,13 +42,12 @@ Required for notification service. Look up "How to get hypixel api key" for info
 
 ### Docker (Recommended)
 This is the reccomended method of installation. You must install docker, but docker-compose isn't required.
-In the folder with your "env" file, run the command `docker run -d --env-file ./env professorpiggos/hycord:latest`. That's all that you have to do. If you run this command when a new release has been added, it will automatically update. You can also build your own image using the Dockerfile in the repository, or download an image from GitHub Packages.
+In the folder with your ".env" file, run the command `docker run -d --env-file ./.env professorpiggos/hycord:latest`. That's all that you have to do. If you run this command when a new release has been added, it will automatically update. You can also build your own image using the Dockerfile in the repository, or download an image from GitHub Packages.
 ### Manual
 This isn't recommended as you won't get automatic updates on restart, but you can do it. 
 1. Run the command `git clone https://github.com/ProfessorPiggos/HyCord/`.
-2. Rename "env" file to ".env" and follow instructions above.
-3. Run the command `pip install -r requirements.txt`.
-4. Run `python ./app/hycord.py`. If running on a server, run this inside of a `screen` instance.
+2. Run the command `pip install -r requirements.txt`.
+3. Run `python ./app/hycord.py`. If running on a server, run this inside of a `screen` instance.
 ## Requirements
 ### Python 3.8+
 Programmed in Python 3.8.5. You must have at least 3.8, this is a dependency of the nextcord library.
