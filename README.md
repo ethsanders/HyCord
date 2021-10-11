@@ -42,7 +42,7 @@ Required for notification service. Look up "How to get hypixel api key" for info
 
 ### Docker (Recommended)
 This is the reccomended method of installation. You must install docker, but docker-compose isn't required.
-In the folder with your ".env" file, run the command `docker run -d --env-file ./.env professorpiggos/hycord:latest`. That's all that you have to do. If you run this command when a new release has been added, it will automatically update. Releases are added on all sizeable feature updates, minor fixes aren't published.
+In the folder with your ".env" file, run the command `docker run -d -v hycordjson:/app/data --env-file ./.env --restart always professorpiggos/hycord:latest`. That's all that you have to do. BeReleases are made added on all sizeable feature updates, minor fixes aren't published. You can also run the update.sh update script if you would like to update the bot without running a lot of docker commands.
 
 You can also build your own image using the Dockerfile in the repository, or download an image from GitHub Packages. The packages on Github Packages are beta builds.  They may have more features, but may also be buggier. 
 If you build directly from the development branch (this would be similar to an "alpha"), there is a chance that the code just flat-out won't work, as there is no QC on this branch.
