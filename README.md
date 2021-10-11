@@ -24,7 +24,7 @@ As the TLDR says above, this bot provides player notifications via Discord DMs. 
 ## Installation
 ### General Installation
 1. Make a folder for the repository.
-2. For all installation methods you will  need the ".env" file in the root of the repository. For Docker installation, that can be downloaded [here](https://github.com/ProfessorPiggos/HyCord/blob/master/.env).
+2. For all installation methods you will  need the ".env" file in the root of the repository. For Docker installation, that can be downloaded [here](https://github.com/ProfessorPiggos/HyCord/blob/master/.env). You can get this while cloning the repository with the manual method.
 3. Edit the values in the ".env" file. You can do this by editing the values after the equals sign. Information on each value can be found below.
 #### Required:
 ###### TOKEN
@@ -42,7 +42,10 @@ Required for notification service. Look up "How to get hypixel api key" for info
 
 ### Docker (Recommended)
 This is the reccomended method of installation. You must install docker, but docker-compose isn't required.
-In the folder with your ".env" file, run the command `docker run -d --env-file ./.env professorpiggos/hycord:latest`. That's all that you have to do. If you run this command when a new release has been added, it will automatically update. You can also build your own image using the Dockerfile in the repository, or download an image from GitHub Packages.
+In the folder with your ".env" file, run the command `docker run -d --env-file ./.env professorpiggos/hycord:latest`. That's all that you have to do. If you run this command when a new release has been added, it will automatically update. Releases are added on all sizeable feature updates, minor fixes aren't published.
+
+You can also build your own image using the Dockerfile in the repository, or download an image from GitHub Packages. The packages on Github Packages are beta builds.  They may have more features, but may also be buggier. 
+If you build directly from the development branch (this would be similar to an "alpha"), there is a chance that the code just flat-out won't work, as there is no QC on this branch.
 ### Manual
 This isn't recommended as you won't get automatic updates on restart, but you can do it. 
 1. Run the command `git clone https://github.com/ProfessorPiggos/HyCord/`.
