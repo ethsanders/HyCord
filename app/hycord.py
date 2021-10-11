@@ -120,7 +120,7 @@ def main():
                                             await user.send(f'**{curname}** joined the game "{game}". They are currently in the mode "{mode}".')
         @tasks.loop(seconds=45)
         async def check(self) -> None:
-            global dumpcount
+            nonlocal dumpcount
             unixtime = int(datetime.now(timezone.utc).timestamp() * 1000) # ms timestamp
             for a in jslist['track']:
                 if not a in jslist['online']:
