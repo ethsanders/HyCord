@@ -137,7 +137,7 @@ def main():
                                             async with session2.get(f'https://api.mojang.com/user/profiles/{a}/names') as t:
                                                 if t.status == 200:
                                                     js2 = await t.json()
-                                                    curname = js2[(len(js2)-1)]["name"]
+                                                    curname = js2[-1]["name"]
                                                     jslist['online'][a]['displayname'] = curname
                                                     try:
                                                         game = USERGAMESLIST[GAMESLIST.index(jslist['online'][a]["game"])]
@@ -206,7 +206,7 @@ def main():
                         currentname = playerlist[i]
                         output += (f"{currentname}, ")
                     else:
-                        currentname = playerlist[len(playerlist)-1]
+                        currentname = playerlist[-1]
                         output += (f"and {currentname}.")
                 else:
                     output = f"**1 player:** {playerlist[0]}"
