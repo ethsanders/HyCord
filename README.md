@@ -53,7 +53,7 @@ This isn't recommended as you won't get automatic updates on restart, but you ca
 3. Run `python ./app/hycord.py`. If running on a server, run this inside of a `screen` instance.
 ## Requirements
 ### Python 3.8+
-Programmed in Python 3.8.5. You must have at least 3.8, this is a dependency of the nextcord library.
+Programmed in Python 3.8.5. You must have at least version 3.8 or higher, this is a dependency of the nextcord library.
 ### Discord account
 (obviously)
 ### Minecraft Account
